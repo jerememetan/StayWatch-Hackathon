@@ -9,7 +9,7 @@ Continue in **E:\Projects\StayWatch-Hackathon**, the current user's project chec
 
 The latest user decision is: **use A-03-01 from the supplied dataset as the main demo**, replacing the original #18-04. Its internal ID is **UNIT-003**.
 
-The mock database and real AI tool-call implementation are present. Recent work adds queue controls, score/comparison explanations, a full-width report workspace with downloads, and separate room-photo review. Computer vision describes visible furniture/layout only; it does not determine whether tenants are unauthorized or infer legal status.
+The mock database and real AI tool-call implementation are present. Recent work adds queue controls, score/comparison explanations, a full-width report workspace with downloads, and separate entrance CCTV-still review. Computer vision describes visible outdoor scene objects only; it does not determine whether tenants are unauthorized or infer legal status.
 
 This checkout was clean at commit `e69cc79` when resumed; the prior implementation is already committed. The current verification fixes and documentation updates are uncommitted. Preserve the supplied dataset and any local environment files. No commit or push was requested. The verified production app was started at http://localhost:3000 for the walkthrough; check whether it is still running before starting another server.
 
@@ -167,14 +167,14 @@ This guard is a targeted heuristic, not comprehensive semantic proof of every mo
 
 Files: src/components/dashboard.tsx, unit-detail.tsx, investigation-panel.tsx, case-report.tsx, their CSS modules, src/lib/report-export.ts, and src/app/globals.css.
 
-## Room photo review
+## Entrance CCTV review
 
-- Separate expandable unit-page panel, reachable through **Review room photo**.
-- `POST /api/photo-review` accepts one JPEG, PNG, or WebP up to 5 MB. It bounds request size, validates actual image pixels, rejects animations/unsafe dimensions, and strips metadata in memory before provider transmission.
+- Separate expandable unit-page panel, reachable through **Review CCTV still**.
+- `POST /api/photo-review` accepts one JPEG, PNG, or WebP still up to 5 MB. It bounds request size, validates actual image pixels, rejects animations/unsafe dimensions, and strips metadata in memory before provider transmission.
 - One stateless OpenAI Responses request with no retries and structured output. `OPENAI_VISION_MODEL` defaults to `gpt-4.1-mini`.
-- Output is limited to fixed furniture/layout/limitation categories and bounded counts. It cannot make identity, occupancy, tenancy, immigration, or legal claims.
-- Photos are never saved. The review never changes a score or enters an investigation report automatically. Without a configured key, local preview works but analysis is disabled and the API returns 503.
-- 28 photo-review validation/mocked tests pass. No live image was sent in this checkout.
+- Output is limited to fixed outdoor scene/layout/limitation categories and bounded counts (luggage, drop-off vehicles, entrance context). It cannot make identity, occupancy, tenancy, immigration, or legal claims, and it does not perform facial recognition or plate reading.
+- Stills are never saved. The review never changes a score or enters an investigation report automatically. Without a configured key, local preview works but analysis is disabled and the API returns 503.
+- Photo-review validation/mocked tests cover the CCTV still schema. No live image was sent in this checkout.
 
 ## Verification completed in the current checkout
 

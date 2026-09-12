@@ -65,15 +65,15 @@ npm run build
 
 Tests mock the external services and do not spend API credits. A real investigation from the app uses your configured services and their normal API usage.
 
-Verified on 12 September 2026: the importer check, all 80 tests, typecheck, lint, production build, and browser checks at 1440, 900, 390, and 320 pixels passed. Checks cover filtering/search, report downloads, evidence expansion, failed retries, and local photo preview/removal. The current checkout has no local service keys configured; new vision calls were verified with mocked responses only. See [HANDOVER.md](HANDOVER.md) for details.
+Verified on 12 September 2026: the importer check, all 80 tests, typecheck, lint, production build, and browser checks at 1440, 900, 390, and 320 pixels passed. Checks cover filtering/search, report downloads, evidence expansion, failed retries, and local CCTV-still preview/removal. The current checkout has no local service keys configured; new vision calls were verified with mocked responses only. See [HANDOVER.md](HANDOVER.md) for details.
 
-## Room photo review
+## Entrance CCTV review
 
-Open a unit, choose **Review room photo**, and expand **Room photo review**. Select a JPEG, PNG, or WebP up to 5 MB to preview it locally. **Analyze photo** requires `OPENAI_API_KEY`; `OPENAI_VISION_MODEL` optionally overrides its default `gpt-4.1-mini` model.
+Open a unit, choose **Review CCTV still**, and expand **Entrance CCTV review**. Select a JPEG, PNG, or WebP snapshot up to 5 MB to preview it locally. **Analyze still** requires `OPENAI_API_KEY`; `OPENAI_VISION_MODEL` optionally overrides its default `gpt-4.1-mini` model.
 
-The feature describes visible furniture and room-layout details with approximate counts and uncertainty. It cannot determine who lives in a unit, tenancy authorization, immigration status, or wrongdoing. It never changes the unit score or automatically enters an investigation report.
+The feature describes visible outdoor scene objects—luggage, drop-off vehicles, and similar items—with approximate counts and uncertainty. It is a still-frame review of a condominium or HDB entrance, driveway, or common area. It cannot determine who lives in a unit, tenancy authorization, immigration status, or wrongdoing, and it does not perform facial recognition or read plates. It never changes the unit score or automatically enters an investigation report.
 
-Selecting a photo does not send it anywhere. Clicking **Analyze photo** sends a decoded, resized copy with image metadata removed to OpenAI. StayWatch does not save the photo; provider data policies apply. Use room photos without people or personal documents. A missing key disables analysis; no simulated vision result is substituted.
+Selecting a still does not send it anywhere. Clicking **Analyze still** sends a decoded, resized copy with image metadata removed to OpenAI. StayWatch does not save the image; provider data policies apply. Use outdoor entrance or driveway stills without faces, plates, or personal documents. A missing key disables analysis; no simulated vision result is substituted.
 
 ## Guardrails
 

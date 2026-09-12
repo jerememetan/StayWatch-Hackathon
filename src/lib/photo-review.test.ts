@@ -7,9 +7,9 @@ const { create, clientOptions } = vi.hoisted(() => ({ create: vi.fn(), clientOpt
 vi.mock("openai", () => ({ default: vi.fn().mockImplementation((options: unknown) => { clientOptions(options); return { responses: { create } }; }) }));
 
 const assessment: PhotoAssessment = {
-  view: "room", quality: "limited",
-  objects: [{ kind: "bed_frame", visibleCount: 2, certainty: "uncertain" }],
-  layoutFeatures: ["partial_room_view"], limitations: ["cropped_view", "perspective"],
+  view: "exterior", quality: "limited",
+  objects: [{ kind: "rolling_luggage", visibleCount: 2, certainty: "uncertain" }],
+  layoutFeatures: ["entrance_or_lobby_view"], limitations: ["cropped_view", "perspective"],
 };
 
 let photo: Buffer;
@@ -21,7 +21,7 @@ beforeEach(async () => {
 });
 afterEach(() => vi.unstubAllEnvs());
 
-describe("bounded room observations", () => {
+describe("bounded exterior observations", () => {
   it("accepts supported, approximate object observations", () => {
     expect(isPhotoAssessment(assessment)).toBe(true);
   });
@@ -29,11 +29,13 @@ describe("bounded room observations", () => {
   it.each([
     { ...assessment, conclusion: "illegal tenant" },
     { ...assessment, objects: [{ kind: "person", visibleCount: 1, certainty: "clear" }] },
+    { ...assessment, objects: [{ kind: "bed_frame", visibleCount: 2, certainty: "uncertain" }] },
     { ...assessment, objects: [{ ...assessment.objects[0], visibleCount: -1 }] },
     { ...assessment, objects: [{ ...assessment.objects[0], visibleCount: 1.5 }] },
     { ...assessment, objects: [{ ...assessment.objects[0], visibleCount: 21 }] },
     { ...assessment, objects: [...assessment.objects, ...assessment.objects] },
-    { ...assessment, view: "not_room" },
+    { ...assessment, view: "room" },
+    { ...assessment, view: "not_exterior" },
     { ...assessment, quality: "unusable" },
     { ...assessment, limitations: [] },
     { ...assessment, layoutFeatures: ["unauthorized_occupancy"] },
@@ -87,7 +89,9 @@ describe("photo review service", () => {
     expect(create).toHaveBeenCalledTimes(1);
     expect(clientOptions).toHaveBeenCalledWith({ apiKey: "test-key-never-sent", timeout: 25000, maxRetries: 0 });
     const [input, options] = create.mock.calls[0];
-    expect(input).toMatchObject({ store: false, model: "gpt-4.1-mini", text: { format: { type: "json_schema", strict: true } } });
+    expect(input).toMatchObject({ store: false, model: "gpt-4.1-mini", text: { format: { type: "json_schema", name: "cctv_still_observations", strict: true } } });
+    expect(input.instructions).toMatch(/CCTV still|condominium or HDB/i);
+    expect(input.instructions).not.toMatch(/furniture|bed frame|mattress/i);
     expect(input.tools).toBeUndefined();
     expect(JSON.stringify(input)).not.toContain("UNIT-003");
     expect(input.input[0].content[1].image_url).toMatch(/^data:image\/jpeg;base64,/);
@@ -106,7 +110,7 @@ describe("photo review service", () => {
 
   it("does not expose raw provider errors or photo data", async () => {
     create.mockRejectedValue(new Error("key=sk-secret image-data-sensitive"));
-    await expect(reviewPhoto("UNIT-003", photo, "image/png")).rejects.toThrow("Photo review could not complete.");
+    await expect(reviewPhoto("UNIT-003", photo, "image/png")).rejects.toThrow("CCTV review could not complete.");
     await expect(reviewPhoto("UNIT-003", photo, "image/png")).rejects.not.toThrow("sk-secret");
   });
 });
