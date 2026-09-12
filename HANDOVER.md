@@ -1,18 +1,17 @@
 # StayWatch handover
 
 Updated: 12 September 2026 (Singapore).
-Status: implementation paused at the user's request to conserve tokens. Do not assume final verification is complete.
+Status: app improvements and local verification completed on 12 September 2026. Import check, 80 tests, typecheck, lint, production build, and desktop/mobile browser checks passed. No live services were called in this session.
 
 ## Start here
 
-Continue in **C:\Users\jerem\Documents\Github\StayWatch-Hackathon**.
-This is the user's StayWatch Hackathon repository, not the original projectless Codex directory.
+Continue in **E:\Projects\StayWatch-Hackathon**, the current user's project checkout. The earlier machine's `C:\Users\jerem\Documents\Github\StayWatch-Hackathon` path is historical.
 
 The latest user decision is: **use A-03-01 from the supplied dataset as the main demo**, replacing the original #18-04. Its internal ID is **UNIT-003**.
 
-The immediate request was to connect a mock database so the AI can perform real tool calls. That implementation is in the working tree. The next agent should review the latest small safety fix and run final checks, not rebuild the app or generate a replacement dataset.
+The mock database and real AI tool-call implementation are present. Recent work adds queue controls, score/comparison explanations, a full-width report workspace with downloads, and separate room-photo review. Computer vision describes visible furniture/layout only; it does not determine whether tenants are unauthorized or infer legal status.
 
-All changes are uncommitted. Preserve the existing user work, supplied dataset, and local environment file. No commit or push was requested. The development server started by the previous agent was stopped for this handover. No further live API calls are needed just to resume.
+This checkout was clean at commit `e69cc79` when resumed; the prior implementation is already committed. The current verification fixes and documentation updates are uncommitted. Preserve the supplied dataset and any local environment files. No commit or push was requested. The verified production app was started at http://localhost:3000 for the walkthrough; check whether it is still running before starting another server.
 
 ## Product and scope
 
@@ -36,7 +35,7 @@ npm run dev
 Open http://localhost:3000, select A-03-01, then Start investigation.
 Direct unit URL: http://localhost:3000/units/UNIT-003.
 
-The user has already configured OPENAI_API_KEY and EXA_API_KEY in the local .env file. Do not print, copy, commit, or overwrite their values. Both .env and .env.local are now ignored; .env.example remains trackable.
+The previous machine had OPENAI_API_KEY and EXA_API_KEY configured. This checkout has no `.env` or `.env.local`; its browser investigation returned the explicitly labeled offline mode. Configure keys locally for a live demo if desired. Do not print, copy, commit, or overwrite existing key values. Both .env and .env.local are ignored; .env.example remains trackable.
 
 Default model: gpt-4.1-mini. Optional override: OPENAI_MODEL.
 Restart the server after changing environment values.
@@ -141,30 +140,56 @@ Exa search is conditional on the model finding it useful, not forced. Queries mu
 
 Reports contain unitNumber, disposition, summary, potentialIndicators, supportingEvidence, uncertainty, recommendedHumanReview, confidence, and optional retrieved webSources. Missing-source and synthetic-context caveats are retained. Check the actual TypeScript schema before changing field names.
 
-## Latest fix: landed, needs final integrated verification
+## Missing-source guard: verified with a follow-up correction
 
 A real run correctly acknowledged missing security/complaint records in uncertainty but also incorrectly wrote “no security incidents” and “no resident complaints” in supporting evidence.
 
 The API subagent added a targeted guard in investigation.ts to reject unsupported absence claims when the relevant source is unavailable. create_case_report returns an actionable error so the model can revise its draft. Explicit missing-data wording such as “No security reports are available” remains accepted. A prompt sentence reinforces this distinction.
 
-Regression cases cover the false claims in summary, potential indicators, and supporting evidence, followed by a corrected report. The subagent reported **12 investigation tests passing** after a red/green cycle. The orchestrator inspected the changes but has not rerun the full suite, lint, typecheck, or build after this final patch.
+Final review found that this guard also rejected accurate caveats, including the tool's own “not proof that no incidents occurred” wording. The follow-up fix removes specific missing-data and uncertainty spans before checking remaining assertions. It accepts coordinated missing-source wording and “No conclusion ... can be drawn” while still rejecting separate unsupported claims in the same sentence.
+
+The investigation suite now has **20 passing tests**, including the original rejection/revision coverage, seven acceptance/mixed-claim regression cases, and the improved offline report's whole-month/comparison explanation. The full suite, typecheck, lint, and production build passed.
 
 This guard is a targeted heuristic, not comprehensive semantic proof of every model statement. Rejected drafts remain visible in the actual tool trace as error events; the accepted report must not contain the rejected assertions.
 
-## UI: implemented
+## UI: implemented and improved
 
 - Dashboard uses the supplied property, 24 units, actual date window, and 2,946 combined source records.
-- A-03-01 is the featured demo.
-- Unit details display actual access/visitor counts and explicitly unavailable sources.
-- Timeline replays completed real tool events after the request returns; it is not live streaming.
-- Expandable steps expose query parameters and returned evidence JSON.
-- Timeline distinguishes complete, unavailable, and error results.
+- A-03-01 is featured; B-03-02 is linked as a routine comparison.
+- Queue supports unit search, block filtering, indicator/routine filters, priority/unit sorting, and empty-state recovery.
+- Unit details show whole-month counts, equal-window comparisons, score points/thresholds, and unavailable sources.
+- Reports use the full content width, appear immediately, and retain actual source checks behind an expandable disclosure.
+- Markdown and JSON exports include timestamps, mode, citations, uncertainty, and source checks; downloads remain local.
+- Failed retries preserve the previous successful report with its completion time.
 - Report displays real public source links when retrieved.
-- Live AI with mock records and offline mode are labeled distinctly.
+- Live AI with mock records and offline mode are labeled distinctly before starting and on results.
+- Offline reports now explain the same whole-month score rationale and actual declines as the unit page.
 
-Files: src/components/dashboard.tsx, unit-detail.tsx, investigation-panel.tsx, case-report.tsx, and src/app/globals.css.
+Files: src/components/dashboard.tsx, unit-detail.tsx, investigation-panel.tsx, case-report.tsx, their CSS modules, src/lib/report-export.ts, and src/app/globals.css.
 
-## Verification evidence before pause
+## Room photo review
+
+- Separate expandable unit-page panel, reachable through **Review room photo**.
+- `POST /api/photo-review` accepts one JPEG, PNG, or WebP up to 5 MB. It bounds request size, validates actual image pixels, rejects animations/unsafe dimensions, and strips metadata in memory before provider transmission.
+- One stateless OpenAI Responses request with no retries and structured output. `OPENAI_VISION_MODEL` defaults to `gpt-4.1-mini`.
+- Output is limited to fixed furniture/layout/limitation categories and bounded counts. It cannot make identity, occupancy, tenancy, immigration, or legal claims.
+- Photos are never saved. The review never changes a score or enters an investigation report automatically. Without a configured key, local preview works but analysis is disabled and the API returns 503.
+- 28 photo-review validation/mocked tests pass. No live image was sent in this checkout.
+
+## Verification completed in the current checkout
+
+- Importer `--check`: passed. A fresh Windows checkout initially failed because Git converted the generated JSON from LF to CRLF. The check now normalizes physical line endings before comparing serialized content. The source dataset and generated data are unchanged. Regression coverage checks LF, CRLF, and rejection of an altered access event.
+- Full suite: **80 tests passed** (9 data, 2 scoring, 20 investigation, 10 investigation route, 21 photo review, 7 photo route, 11 report export/response validation).
+- Typecheck and ESLint: passed.
+- Production build: passed with Next.js 15.5.25 from the committed lockfile, with no dev server running. Tailwind emitted a non-fatal warning about its absent content configuration; the current UI uses its existing handwritten CSS and rendered correctly.
+- Production-server browser walkthrough: dashboard displayed 24 units and 2,946 records; dashboard → A-03-01 → Start investigation returned HTTP 200 in offline mode; all five timeline steps and the case report appeared; expanded evidence contained UNIT-003.
+- Screenshots inspected at desktop and phone widths. No page errors or horizontal overflow at 1440px, 390px, or 320px. At the narrowest width some table unit labels wrap, with content remaining readable.
+- `git diff --check`: passed.
+- Dependencies were initially absent and were installed using `npm ci` from the existing lockfile. The bundled Node runtime had no standalone npm command, so bundled pnpm invoked npm 10.9.3 for installation. Package manifests and lockfile were unchanged.
+- Tests and the temporary browser profile needed scoped access outside the Windows sandbox. The in-app browser tool could not initialize, so the walkthrough used a fresh headless Chrome context through bundled Playwright.
+- No external service calls or API credits were used in this session.
+
+## Historical live-service evidence from the previous machine
 
 Completed by the orchestrator before the final absence-claim guard:
 
@@ -179,17 +204,15 @@ Completed by the orchestrator before the final absence-claim guard:
 
 The observed model runs chose NOT to search Exa. Do not claim those reports used live web evidence. Exa connectivity was tested separately.
 
-After the latest patch, only the subagent's targeted 12-test investigation run is confirmed. A current full-suite total has not been verified.
-
-**Production build has not been run for this set of changes.** Final screenshot/responsive review is also outstanding. Do not rely on any prior build claim from the original MVP.
+Those live runs predate both guard corrections. Current mocked tests cover report rejection and revision; the production browser walkthrough covers offline rendering. A live run with the latest guard has not been performed.
 
 Tests mock external services and should not consume API credits.
 
-## Next agent checklist
+## Next steps / repeatable checks
 
-1. Read this file and inspect the current diff. Preserve user work and local keys.
-2. Review the latest missing-source absence-claim guard and its regression tests.
-3. Run the final checks:
+The requested local verification is complete. For a demo, open A-03-01 and start an investigation. This checkout currently uses offline mode; live AI requires locally configured keys and a server restart. A live verification run is optional and consumes the configured services' normal usage.
+
+After further code changes, the repeatable checks are:
    ```bash
    node scripts/import-mock-data.mjs --check
    npm test
@@ -198,20 +221,17 @@ Tests mock external services and should not consume API credits.
    npm run build
    git diff --check
    ```
-4. Run build with the dev server stopped to avoid shared .next output conflicts.
-5. Start the app and verify dashboard → A-03-01 → timeline/report presentation. If using an already-open browser tab, reload it: its previous report predates the guard and may contain the invalid statements.
-6. Fix only genuine integration failures. Do not expand scope. A further paid live investigation is optional, not necessary merely to rerun tests.
-7. Update this handover/README with actual verification results and provide a concise demo handoff. Do not commit or push unless asked.
+Run build with the dev server stopped to avoid shared .next output conflicts. Reload old browser tabs before rechecking reports. Do not commit or push unless asked.
 
 ## Environment / repository notes
 
 - Windows PowerShell was used.
-- The real repository is outside the prior Codex writable roots. Some commands required a scoped sandbox escalation to this exact project; if access fails, handle permission normally rather than editing the abandoned projectless copy.
-- Vitest/esbuild startup may fail under the old restrictive sandbox; the same checks passed with scoped project access.
-- No dependency installation was necessary in the latest work; node_modules already existed.
+- The current repository is inside the writable workspace. Some Windows temporary-directory operations still require scoped sandbox escalation.
+- Vitest may fail before collecting tests when sandbox access to Windows temporary directories is blocked; rerun with the appropriate permission instead of treating this as an application failure.
+- Dependencies are now installed in this checkout.
 - eslint.config.mjs now uses Next/TypeScript rules and ignores generated next-env.d.ts.
 - package.json includes data:import and typecheck scripts.
 - README.md and .env.example contain current run instructions.
 - docs/mock-data-plan.md reflects the supplied dataset. The older docs/superpowers/plans/2026-09-12-staywatch-mvp.md is historical and may still reference #18-04.
-- The generated data/, importer scripts/, new tests/types/schema, supplied staywatch_demo_dataset/, and this handover may be untracked. Include the required data/source files when the user later asks to commit.
+- The generated data, importer, tests/types/schema, supplied dataset, and this handover are tracked. Current uncommitted changes are the importer line-ending fix, the guard correction, their regressions, and documentation updates.
 - Do not commit .env, .env.local, node_modules, or .next.

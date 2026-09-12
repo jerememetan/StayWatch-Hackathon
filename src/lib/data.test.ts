@@ -1,4 +1,7 @@
 import { execFileSync } from "node:child_process";
+import { copyFileSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { accessActivity, getMockDataStats, getResidentComplaints, getSecurityReports, getUnitActivity, getUnitActivityPage, getUnitById, getUnitByNumber, mockDatabase, units, visitorActivity } from "./data";
 import { scoreUnit } from "./scoring";
@@ -24,6 +27,30 @@ describe("imported synthetic mock database", () => {
   it("recreates the committed database exactly from the unmodified source", () => {
     const result = execFileSync(process.execPath, ["scripts/import-mock-data.mjs", "--check"], { cwd: process.cwd(), encoding: "utf8" });
     expect(result).toContain("matches the supplied source exactly");
+  });
+
+  it("ignores checkout line endings while still rejecting changed imported records", () => {
+    const fixture = mkdtempSync(join(tmpdir(), "staywatch-import-"));
+    try {
+      for (const directory of ["scripts", "data", "staywatch_demo_dataset"]) mkdirSync(join(fixture, directory));
+      copyFileSync("scripts/import-mock-data.mjs", join(fixture, "scripts/import-mock-data.mjs"));
+      for (const file of mockDatabase.metadata.sourceFiles) {
+        copyFileSync(join("staywatch_demo_dataset", file), join(fixture, "staywatch_demo_dataset", file));
+      }
+      const databasePath = join(fixture, "data/mock-building.json");
+      const database = readFileSync("data/mock-building.json", "utf8").replace(/\r\n/g, "\n");
+      const check = () => execFileSync(process.execPath, ["scripts/import-mock-data.mjs", "--check"], { cwd: fixture, encoding: "utf8", stdio: "pipe" });
+      for (const newline of ["\n", "\r\n"]) {
+        writeFileSync(databasePath, database.replace(/\n/g, newline));
+        expect(check()).toContain("matches the supplied source exactly");
+      }
+      const changed = JSON.parse(database);
+      changed.accessActivity[0].direction = changed.accessActivity[0].direction === "entry" ? "exit" : "entry";
+      writeFileSync(databasePath, `${JSON.stringify(changed, null, 2)}\n`);
+      expect(check).toThrow("Imported mock database differs from the source");
+    } finally {
+      rmSync(fixture, { recursive: true, force: true });
+    }
   });
 
   it("does not turn authorization dates into measured visits or map credentials to people", () => {

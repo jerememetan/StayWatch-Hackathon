@@ -100,7 +100,10 @@ const database = {
 };
 const serialized = `${JSON.stringify(database, null, 2)}\n`;
 if (process.argv.includes("--check")) {
-  if (await readFile(output, "utf8") !== serialized) throw new Error("Imported mock database differs from the source. Run npm run data:import.");
+  // Git may check out this text file with CRLF on Windows. Compare the same
+  // serialized content without treating checkout line endings as data changes.
+  const existing = (await readFile(output, "utf8")).replace(/\r\n/g, "\n");
+  if (existing !== serialized) throw new Error("Imported mock database differs from the source. Run npm run data:import.");
   console.log("Imported mock database matches the supplied source exactly.");
 } else {
   await mkdir(new URL("../data/", import.meta.url), { recursive: true });
