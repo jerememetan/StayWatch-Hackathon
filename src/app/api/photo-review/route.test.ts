@@ -66,7 +66,7 @@ describe("photo review route", () => {
   });
 
   it("preserves actionable service errors, including missing configuration", async () => {
-    review.mockRejectedValue(new PhotoReviewError("Photo review is not configured.", 503));
+    review.mockRejectedValue(new PhotoReviewError("CCTV review is not configured.", 503));
     const response = await POST(request(form()));
     expect(response.status).toBe(503);
     expect((await response.json()).error).toMatch(/not configured/);
