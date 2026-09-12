@@ -1,0 +1,260 @@
+{
+  "property": {
+    "property_id": "SG-CND-001",
+    "name": "Harbour Crest Residences",
+    "address": "88 Marina View Crescent, Singapore 019888",
+    "note": "Synthetic demo property; name/address are fictional.",
+    "blocks": [
+      {
+        "block_id": "A",
+        "floors": 12
+      },
+      {
+        "block_id": "B",
+        "floors": 12
+      }
+    ]
+  },
+  "units": [
+    {
+      "unit_id": "UNIT-001",
+      "unit_number": "A-02-01",
+      "block": "A",
+      "floor": 2,
+      "bedrooms": 3,
+      "registered_occupants": 1,
+      "tenancy_type": "owner_occupied",
+      "demo_profile": "normal"
+    },
+    {
+      "unit_id": "UNIT-002",
+      "unit_number": "A-02-02",
+      "block": "A",
+      "floor": 2,
+      "bedrooms": 3,
+      "registered_occupants": 2,
+      "tenancy_type": "owner_occupied",
+      "demo_profile": "normal"
+    },
+    {
+      "unit_id": "UNIT-003",
+      "unit_number": "A-03-01",
+      "block": "A",
+      "floor": 3,
+      "bedrooms": 1,
+      "registered_occupants": 2,
+      "tenancy_type": "owner_occupied",
+      "demo_profile": "rapid_guest_turnover"
+    },
+    {
+      "unit_id": "UNIT-004",
+      "unit_number": "A-03-02",
+      "block": "A",
+      "floor": 3,
+      "bedrooms": 3,
+      "registered_occupants": 4,
+      "tenancy_type": "owner_occupied",
+      "demo_profile": "normal"
+    },
+    {
+      "unit_id": "UNIT-005",
+      "unit_number": "A-04-01",
+      "block": "A",
+      "floor": 4,
+      "bedrooms": 3,
+      "registered_occupants": 3,
+      "tenancy_type": "owner_occupied",
+      "demo_profile": "normal"
+    },
+    {
+      "unit_id": "UNIT-006",
+      "unit_number": "A-04-02",
+      "block": "A",
+      "floor": 4,
+      "bedrooms": 1,
+      "registered_occupants": 1,
+      "tenancy_type": "owner_occupied",
+      "demo_profile": "normal"
+    },
+    {
+      "unit_id": "UNIT-007",
+      "unit_number": "A-05-01",
+      "block": "A",
+      "floor": 5,
+      "bedrooms": 1,
+      "registered_occupants": 4,
+      "tenancy_type": "owner_occupied",
+      "demo_profile": "normal"
+    },
+    {
+      "unit_id": "UNIT-008",
+      "unit_number": "A-05-02",
+      "block": "A",
+      "floor": 5,
+      "bedrooms": 3,
+      "registered_occupants": 2,
+      "tenancy_type": "long_term_tenant",
+      "demo_profile": "late_night_short_stays"
+    },
+    {
+      "unit_id": "UNIT-009",
+      "unit_number": "A-06-01",
+      "block": "A",
+      "floor": 6,
+      "bedrooms": 1,
+      "registered_occupants": 3,
+      "tenancy_type": "long_term_tenant",
+      "demo_profile": "normal"
+    },
+    {
+      "unit_id": "UNIT-010",
+      "unit_number": "A-06-02",
+      "block": "A",
+      "floor": 6,
+      "bedrooms": 1,
+      "registered_occupants": 2,
+      "tenancy_type": "long_term_tenant",
+      "demo_profile": "normal"
+    },
+    {
+      "unit_id": "UNIT-011",
+      "unit_number": "A-07-01",
+      "block": "A",
+      "floor": 7,
+      "bedrooms": 2,
+      "registered_occupants": 2,
+      "tenancy_type": "owner_occupied",
+      "demo_profile": "normal"
+    },
+    {
+      "unit_id": "UNIT-012",
+      "unit_number": "A-07-02",
+      "block": "A",
+      "floor": 7,
+      "bedrooms": 1,
+      "registered_occupants": 2,
+      "tenancy_type": "owner_occupied",
+      "demo_profile": "web_listing_match"
+    },
+    {
+      "unit_id": "UNIT-013",
+      "unit_number": "B-02-01",
+      "block": "B",
+      "floor": 2,
+      "bedrooms": 1,
+      "registered_occupants": 3,
+      "tenancy_type": "owner_occupied",
+      "demo_profile": "normal"
+    },
+    {
+      "unit_id": "UNIT-014",
+      "unit_number": "B-02-02",
+      "block": "B",
+      "floor": 2,
+      "bedrooms": 2,
+      "registered_occupants": 2,
+      "tenancy_type": "long_term_tenant",
+      "demo_profile": "normal"
+    },
+    {
+      "unit_id": "UNIT-015",
+      "unit_number": "B-03-01",
+      "block": "B",
+      "floor": 3,
+      "bedrooms": 1,
+      "registered_occupants": 3,
+      "tenancy_type": "owner_occupied",
+      "demo_profile": "normal"
+    },
+    {
+      "unit_id": "UNIT-016",
+      "unit_number": "B-03-02",
+      "block": "B",
+      "floor": 3,
+      "bedrooms": 2,
+      "registered_occupants": 1,
+      "tenancy_type": "long_term_tenant",
+      "demo_profile": "normal"
+    },
+    {
+      "unit_id": "UNIT-017",
+      "unit_number": "B-04-01",
+      "block": "B",
+      "floor": 4,
+      "bedrooms": 3,
+      "registered_occupants": 4,
+      "tenancy_type": "long_term_tenant",
+      "demo_profile": "repeated_weekend_visitors"
+    },
+    {
+      "unit_id": "UNIT-018",
+      "unit_number": "B-04-02",
+      "block": "B",
+      "floor": 4,
+      "bedrooms": 3,
+      "registered_occupants": 2,
+      "tenancy_type": "owner_occupied",
+      "demo_profile": "normal"
+    },
+    {
+      "unit_id": "UNIT-019",
+      "unit_number": "B-05-01",
+      "block": "B",
+      "floor": 5,
+      "bedrooms": 1,
+      "registered_occupants": 2,
+      "tenancy_type": "long_term_tenant",
+      "demo_profile": "normal"
+    },
+    {
+      "unit_id": "UNIT-020",
+      "unit_number": "B-05-02",
+      "block": "B",
+      "floor": 5,
+      "bedrooms": 1,
+      "registered_occupants": 2,
+      "tenancy_type": "owner_occupied",
+      "demo_profile": "normal"
+    },
+    {
+      "unit_id": "UNIT-021",
+      "unit_number": "B-06-01",
+      "block": "B",
+      "floor": 6,
+      "bedrooms": 2,
+      "registered_occupants": 2,
+      "tenancy_type": "long_term_tenant",
+      "demo_profile": "normal"
+    },
+    {
+      "unit_id": "UNIT-022",
+      "unit_number": "B-06-02",
+      "block": "B",
+      "floor": 6,
+      "bedrooms": 3,
+      "registered_occupants": 2,
+      "tenancy_type": "owner_occupied",
+      "demo_profile": "possible_overcrowding"
+    },
+    {
+      "unit_id": "UNIT-023",
+      "unit_number": "B-07-01",
+      "block": "B",
+      "floor": 7,
+      "bedrooms": 2,
+      "registered_occupants": 2,
+      "tenancy_type": "owner_occupied",
+      "demo_profile": "normal"
+    },
+    {
+      "unit_id": "UNIT-024",
+      "unit_number": "B-07-02",
+      "block": "B",
+      "floor": 7,
+      "bedrooms": 3,
+      "registered_occupants": 2,
+      "tenancy_type": "owner_occupied",
+      "demo_profile": "normal"
+    }
+  ]
+}

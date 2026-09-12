@@ -58,9 +58,13 @@ export type InvestigationEvent = {
   tool: string;
   label: string;
   detail: string;
-  status: "complete";
+  status: "complete" | "unavailable" | "error";
   occurredAt: string;
+  input?: Record<string, unknown>;
+  output?: unknown;
 };
+
+export type WebSource = { id: string; title: string; url: string; excerpt: string };
 
 export type CaseReport = {
   unitNumber: string;
@@ -71,6 +75,7 @@ export type CaseReport = {
   uncertainty: string[];
   recommendedHumanReview: string;
   confidence: "low" | "medium" | "high";
+  webSources?: WebSource[];
 };
 
 export type InvestigationResponse = {

@@ -3,8 +3,8 @@ import { getUnitByNumber } from "./data";
 import { scoreUnit } from "./scoring";
 
 describe("scoreUnit", () => {
-  it("ranks #18-04 for high potential-indicator review", () => {
-    const unit = getUnitByNumber("18-04");
+  it("ranks #A-03-01 for high potential-indicator review", () => {
+    const unit = getUnitByNumber("A-03-01");
 
     expect(unit).toBeDefined();
     expect(scoreUnit(unit!).riskLevel).toBe("high");
@@ -12,7 +12,7 @@ describe("scoreUnit", () => {
   });
 
   it("keeps ordinary activity below a potential-indicator review", () => {
-    const unit = getUnitByNumber("12-02");
+    const unit = getUnitByNumber("B-03-02");
 
     expect(unit).toBeDefined();
     expect(scoreUnit(unit!).riskLevel).not.toBe("high");

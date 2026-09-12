@@ -80,6 +80,11 @@ h2 { font-size:18px; letter-spacing:-.03em; margin:0; }
 .timeline-marker { width:20px; height:20px; display:grid; place-items:center; border-radius:50%; background:#294b3c; color:#baff83; font-weight:800; font-size:12px; }
 .timeline-event strong { color:#e7f2ea; font-size:13px; }
 .timeline-event p { margin:3px 0 0; color:#97aaa2; font-size:12px; }
+.timeline-event > div { min-width:0; }
+.tool-evidence { margin-top:8px; font-size:12px; }
+.tool-evidence summary { cursor:pointer; color:#b6d6c8; }
+.tool-evidence pre { max-height:320px; overflow:auto; white-space:pre-wrap; overflow-wrap:anywhere; padding:10px; background:#091817; border:1px solid #36534c; border-radius:6px; font-size:11px; color:#c5d9ce; }
+.source-link { color:#b9ed92; text-decoration:underline; overflow-wrap:anywhere; }
 .timeline-pending { color:#a5b9b0; align-items:center; font-style:italic; }
 .timeline-pending .timeline-marker { background:#274039; color:#d7e8df; }
 .case-report { border-top:1px solid #36534c; margin-top:1px; padding-top:17px; }

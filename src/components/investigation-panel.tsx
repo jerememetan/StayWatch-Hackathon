@@ -68,14 +68,22 @@ export function InvestigationPanel({ unitId }: { unitId: string }) {
         <div className="investigation-result">
           <div className="timeline-heading">
             <div><span className="eyebrow">Investigation timeline</span><h3>{replaying ? "Replaying completed steps" : "Completed investigation steps"}</h3></div>
-            {result.mode === "demo" && <span className="mode-note">Demo evidence mode</span>}
+            <span className="mode-note">{result.mode === "live" ? "Live AI · mock records" : "Offline demo"}</span>
           </div>
-          {result.mode === "demo" && <p className="config-note">Live OpenAI and Exa search require both environment keys. The case report remains a synthetic, human-review demo.</p>}
+          {result.mode === "demo" && <p className="config-note">OpenAI is not enabled for this run. This is a local review of the mock records; no live services were called.</p>}
           <ol className="investigation-timeline" aria-live="polite">
             {visibleTimeline.map((event) => (
               <li className="timeline-event" key={event.id}>
-                <span className="timeline-marker">✓</span>
-                <div><strong>{toolLabels[event.tool] ?? event.label}</strong><p>{event.detail}</p></div>
+                <span className="timeline-marker" aria-label={event.status}>{event.status === "complete" ? "✓" : "!"}</span>
+                <div>
+                  <strong>{toolLabels[event.tool] ?? event.label}</strong><p>{event.detail}</p>
+                  {event.output !== undefined && (
+                    <details className="tool-evidence">
+                      <summary>Inspect query and returned evidence</summary>
+                      <pre>{JSON.stringify({ tool: event.tool, input: event.input ?? {}, output: event.output }, null, 2)}</pre>
+                    </details>
+                  )}
+                </div>
               </li>
             ))}
             {replaying && <li className="timeline-event timeline-pending"><span className="timeline-marker">…</span><span>Revealing the next completed tool call…</span></li>}

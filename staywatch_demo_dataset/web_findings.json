@@ -1,0 +1,53 @@
+[
+  {
+    "finding_id": "WEB-001",
+    "unit_number": "A-07-02",
+    "source_type": "marketplace_listing",
+    "platform": "ExampleStay.sg",
+    "listing_title": "Marina-view apartment near downtown",
+    "listing_excerpt": "Entire apartment, flexible nightly stays, self check-in.",
+    "nightly_price_sgd": 188,
+    "minimum_stay_nights": 2,
+    "claimed_location": "Marina View area",
+    "image_similarity_score": 0.91,
+    "text_similarity_score": 0.86,
+    "first_seen": "2026-08-10T12:12:00+08:00",
+    "last_seen": "2026-08-28T20:40:00+08:00",
+    "url": "https://example.com/demo-listing/A0702",
+    "synthetic": true
+  },
+  {
+    "finding_id": "WEB-002",
+    "unit_number": "A-03-01",
+    "source_type": "social_media_post",
+    "platform": "StayGram",
+    "listing_title": "Weekend city stay - DM for dates",
+    "listing_excerpt": "Short stays available, near MRT, access card provided.",
+    "nightly_price_sgd": 165,
+    "minimum_stay_nights": 1,
+    "claimed_location": "Downtown Singapore",
+    "image_similarity_score": 0.74,
+    "text_similarity_score": 0.79,
+    "first_seen": "2026-08-14T09:10:00+08:00",
+    "last_seen": "2026-08-25T16:50:00+08:00",
+    "url": "https://example.com/demo-post/A0301",
+    "synthetic": true
+  },
+  {
+    "finding_id": "WEB-003",
+    "unit_number": "B-04-01",
+    "source_type": "classified_ad",
+    "platform": "ListNow",
+    "listing_title": "Room for visitors near CBD",
+    "listing_excerpt": "Available weekends. Message for details.",
+    "nightly_price_sgd": 85,
+    "minimum_stay_nights": 2,
+    "claimed_location": "Central Singapore",
+    "image_similarity_score": 0.41,
+    "text_similarity_score": 0.38,
+    "first_seen": "2026-08-18T11:00:00+08:00",
+    "last_seen": "2026-08-18T11:00:00+08:00",
+    "url": "https://example.com/demo-classified/B0401",
+    "synthetic": true
+  }
+]

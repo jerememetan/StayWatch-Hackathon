@@ -1,142 +1,117 @@
-import type {
-  AccessActivity,
-  ResidentComplaint,
-  SecurityReport,
-  Unit,
-  VisitorActivity,
-} from "./types";
+import importedDatabase from "../../data/mock-building.json";
+import type { ActivityComparison, ActivityPage, ActivityPeriod, ActivitySummary, DateWindow, MockDatabase } from "./mock-types";
+import type { Unit, UnitSignal } from "./types";
 
-export const units: Unit[] = [
-  {
-    id: "unit-18-04",
-    unitNumber: "18-04",
-    residentLabel: "Registered household",
-    floor: 18,
-    bedrooms: 2,
-    riskScore: 0,
-    riskLevel: "low",
-    signals: [
-      {
-        id: "access-turnover",
-        category: "access",
-        title: "Unusually frequent credential turnover",
-        detail: "Several different valid credentials were used during short stays over 14 days.",
-        points: 30,
-      },
-      {
-        id: "visitor-frequency",
-        category: "visitor",
-        title: "Repeated short visitor stays",
-        detail: "Visitor log entries show several brief, consecutive stays with different names.",
-        points: 24,
-      },
-      {
-        id: "security-observation",
-        category: "security",
-        title: "Security observation requires context",
-        detail: "A staff note records luggage arrivals; it does not establish purpose or identity.",
-        points: 16,
-      },
-      {
-        id: "neighbour-concern",
-        category: "complaint",
-        title: "Neighbour concern received",
-        detail: "A nearby resident reported late-night corridor activity; the report is unverified.",
-        points: 12,
-      },
-    ],
-  },
-  {
-    id: "unit-12-02",
-    unitNumber: "12-02",
-    residentLabel: "Registered household",
-    floor: 12,
-    bedrooms: 3,
-    riskScore: 0,
-    riskLevel: "low",
-    signals: [
-      {
-        id: "expected-visitor",
-        category: "visitor",
-        title: "Recorded family visit",
-        detail: "One visitor entry aligns with a normal weekend family visit.",
-        points: 8,
-      },
-    ],
-  },
-  {
-    id: "unit-09-11",
-    unitNumber: "09-11",
-    residentLabel: "Registered household",
-    floor: 9,
-    bedrooms: 1,
-    riskScore: 0,
-    riskLevel: "low",
-    signals: [],
-  },
-  {
-    id: "unit-21-07",
-    unitNumber: "21-07",
-    residentLabel: "Registered household",
-    floor: 21,
-    bedrooms: 2,
-    riskScore: 0,
-    riskLevel: "low",
-    signals: [
-      {
-        id: "one-security-note",
-        category: "security",
-        title: "Single delivery-related note",
-        detail: "A single staff note describes a delivery delay.",
-        points: 10,
-      },
-    ],
-  },
-];
+export const mockDatabase = importedDatabase as MockDatabase;
+export const accessActivity = mockDatabase.accessActivity;
+export const visitorActivity = mockDatabase.visitorActivity;
+export const securityReports = mockDatabase.securityReports;
+export const residentComplaints = mockDatabase.residentComplaints;
 
-export const accessActivity: AccessActivity[] = [
-  { id: "access-1804-1", unitId: "unit-18-04", occurredAt: "2026-09-09T22:18:00+08:00", direction: "entry", credentialLabel: "Valid credential A", note: "Evening entry recorded." },
-  { id: "access-1804-2", unitId: "unit-18-04", occurredAt: "2026-09-10T09:42:00+08:00", direction: "exit", credentialLabel: "Valid credential A", note: "Morning exit recorded." },
-  { id: "access-1804-3", unitId: "unit-18-04", occurredAt: "2026-09-10T17:06:00+08:00", direction: "entry", credentialLabel: "Valid credential B", note: "Different valid credential recorded." },
-  { id: "access-1804-4", unitId: "unit-18-04", occurredAt: "2026-09-12T13:20:00+08:00", direction: "entry", credentialLabel: "Valid credential C", note: "Different valid credential recorded." },
-  { id: "access-1202-1", unitId: "unit-12-02", occurredAt: "2026-09-08T11:00:00+08:00", direction: "entry", credentialLabel: "Registered credential", note: "Weekend entry recorded." },
-];
-
-export const visitorActivity: VisitorActivity[] = [
-  { id: "visitor-1804-1", unitId: "unit-18-04", occurredAt: "2026-09-09T22:06:00+08:00", visitorLabel: "Visitor 1", purpose: "Not stated", note: "Signed in with one overnight bag." },
-  { id: "visitor-1804-2", unitId: "unit-18-04", occurredAt: "2026-09-10T16:51:00+08:00", visitorLabel: "Visitor 2", purpose: "Not stated", note: "Signed in for unit 18-04." },
-  { id: "visitor-1804-3", unitId: "unit-18-04", occurredAt: "2026-09-12T13:07:00+08:00", visitorLabel: "Visitor 3", purpose: "Not stated", note: "Signed in with rolling luggage." },
-  { id: "visitor-1202-1", unitId: "unit-12-02", occurredAt: "2026-09-08T10:48:00+08:00", visitorLabel: "Family visitor", purpose: "Family visit", note: "Signed in for a daytime visit." },
-];
-
-export const securityReports: SecurityReport[] = [
-  { id: "security-1804-1", unitId: "unit-18-04", occurredAt: "2026-09-10T17:10:00+08:00", observation: "Staff observed a visitor with luggage at the lift lobby. No rule breach was observed.", status: "noted" },
-  { id: "security-2107-1", unitId: "unit-21-07", occurredAt: "2026-09-07T15:00:00+08:00", observation: "Delivery vehicle waited briefly at the loading bay.", status: "noted" },
-];
-
-export const residentComplaints: ResidentComplaint[] = [
-  { id: "complaint-1804-1", unitId: "unit-18-04", occurredAt: "2026-09-11T08:30:00+08:00", concern: "A nearby resident reported late-night corridor activity on two evenings.", status: "received" },
-];
-
-export function getUnitById(id: string): Unit | undefined {
-  return units.find((unit) => unit.id === id);
+function windowFor(period: ActivityPeriod): DateWindow {
+  if (period === "recent") return mockDatabase.metadata.recentWindow;
+  if (period === "baseline") return mockDatabase.metadata.baselineWindow;
+  return mockDatabase.metadata.observationWindow;
 }
-
-export function getUnitByNumber(unitNumber: string): Unit | undefined {
-  return units.find((unit) => unit.unitNumber === unitNumber);
+function inWindow(occurredAt: string, window: DateWindow): boolean {
+  const day = occurredAt.slice(0, 10);
+  return day >= window.start && day <= window.end;
 }
-
-export function getUnitActivity(unitId: string): { access: AccessActivity[]; visitors: VisitorActivity[] } {
+function scopedActivity(unitId: string, period: ActivityPeriod) {
+  const window = windowFor(period);
   return {
-    access: accessActivity.filter((activity) => activity.unitId === unitId),
-    visitors: visitorActivity.filter((activity) => activity.unitId === unitId),
+    access: accessActivity.filter((record) => record.unitId === unitId && inWindow(record.occurredAt, window)),
+    visitors: visitorActivity.filter((record) => record.unitId === unitId && inWindow(record.occurredAt, window)),
+  };
+}
+function summarize(unitId: string, period: ActivityPeriod): ActivitySummary {
+  const { access, visitors } = scopedActivity(unitId, period);
+  const granted = access.filter((record) => record.result === "granted");
+  return {
+    period, window: windowFor(period), accessCount: access.length,
+    entryCount: granted.filter((record) => record.direction === "entry").length,
+    exitCount: granted.filter((record) => record.direction === "exit").length,
+    grantedCount: granted.length, deniedCount: access.length - granted.length,
+    uniqueCredentials: new Set(granted.map((record) => record.credentialId)).size,
+    uniqueVisitorCredentials: new Set(granted.filter((record) => ["visitor_card", "visitor_qr"].includes(record.holderType)).map((record) => record.credentialId)).size,
+    visitorCount: visitors.length, uniqueVisitors: new Set(visitors.map((record) => record.visitorId)).size,
+    overnightVisitors: null,
+    shortAuthorizationCount: visitors.filter((record) => {
+      const hours = (Date.parse(record.validUntil) - Date.parse(record.validFrom)) / 3_600_000;
+      return hours >= 24 && hours <= 72;
+    }).length,
+    lateNightEntries: granted.filter((record) => {
+      const hour = Number(record.occurredAt.slice(11, 13));
+      return record.direction === "entry" && (hour >= 22 || hour < 6);
+    }).length,
+    familyVisitors: visitors.filter((record) => record.context === "family").length,
+    maintenanceVisitors: visitors.filter((record) => record.context === "maintenance").length,
+  };
+}
+function compareActivity(unitId: string): ActivityComparison {
+  const baseline = summarize(unitId, "baseline"), recent = summarize(unitId, "recent");
+  return {
+    baseline, recent, all: summarize(unitId, "all"),
+    changes: {
+      accessCount: recent.accessCount - baseline.accessCount,
+      uniqueCredentials: recent.uniqueCredentials - baseline.uniqueCredentials,
+      visitorCount: recent.visitorCount - baseline.visitorCount,
+      uniqueVisitors: recent.uniqueVisitors - baseline.uniqueVisitors,
+    },
+    limitations: [...mockDatabase.metadata.limitations,
+      "Visitor counts measure registrations whose authorization starts in the window, not confirmed visits; uniqueVisitors counts registration IDs, not verified people.",
+      "Entry/exit and credential metrics count granted access only; accessCount also includes denied attempts. Overnight visitors cannot be measured from these records.",
+    ],
+  };
+}
+export function getUnitActivity(unitId: string) {
+  return { access: accessActivity.filter((record) => record.unitId === unitId), visitors: visitorActivity.filter((record) => record.unitId === unitId) };
+}
+export function getSecurityReports(unitId: string) { return securityReports.filter((record) => record.unitId === unitId); }
+export function getResidentComplaints(unitId: string) { return residentComplaints.filter((record) => record.unitId === unitId); }
+
+export function getUnitActivityPage(unitId: string, options: { period?: ActivityPeriod; offset?: number; limit?: number } = {}): ActivityPage {
+  if (!mockDatabase.units.some((unit) => unit.id === unitId)) throw new Error("Unknown unit");
+  const period = options.period ?? "recent", offset = options.offset ?? 0, requestedLimit = options.limit ?? 20;
+  if (!["recent", "baseline", "all"].includes(period)) throw new Error("Invalid activity period");
+  if (!Number.isSafeInteger(offset) || offset < 0) throw new Error("Offset must be a nonnegative integer");
+  if (!Number.isSafeInteger(requestedLimit) || requestedLimit < 1) throw new Error("Limit must be a positive integer");
+  const limit = Math.min(requestedLimit, 50);
+  const { access, visitors } = scopedActivity(unitId, period);
+  // Both arrays use the same offset independently. An exhausted table returns [].
+  const newestFirst = <T extends { occurredAt: string; id: string }>(rows: T[]) => rows.sort((a, b) => b.occurredAt.localeCompare(a.occurredAt) || a.id.localeCompare(b.id));
+  return {
+    unitId, period, window: windowFor(period), offset, limit,
+    access: newestFirst(access).slice(offset, offset + limit), visitors: newestFirst(visitors).slice(offset, offset + limit),
+    totals: { access: access.length, visitors: visitors.length },
+    nextOffset: offset + limit < Math.max(access.length, visitors.length) ? offset + limit : null,
+    comparison: compareActivity(unitId),
   };
 }
 
-export function getSecurityReports(unitId: string): SecurityReport[] {
-  return securityReports.filter((report) => report.unitId === unitId);
+function deriveSignals(unitId: string): UnitSignal[] {
+  const all = summarize(unitId, "all"), comparison = compareActivity(unitId);
+  const registrations = getUnitActivity(unitId).visitors.sort((a, b) => a.validFrom.localeCompare(b.validFrom));
+  const consecutiveWindows = registrations.slice(1).filter((registration, index) => {
+    const gapHours = (Date.parse(registration.validFrom) - Date.parse(registrations[index].validUntil)) / 3_600_000;
+    return gapHours >= 0 && gapHours <= 24;
+  }).length;
+  const signals: UnitSignal[] = [];
+  if (all.uniqueVisitorCredentials >= 6) signals.push({ id: "multiple-visitor-credentials", category: "access", points: 30,
+    title: "Multiple visitor credentials recorded", detail: `${all.uniqueVisitorCredentials} distinct visitor credentials received granted access in August. The two 15-day windows contain ${comparison.baseline.uniqueVisitorCredentials} and ${comparison.recent.uniqueVisitorCredentials}; credentials do not identify distinct people.` });
+  if (all.shortAuthorizationCount >= 6) signals.push({ id: "repeated-short-authorizations", category: "visitor", points: 25,
+    title: "Repeated short authorization windows", detail: `${all.shortAuthorizationCount} registrations authorize 24–72 hours. Authorization duration is not a measured stay, and stated purposes may have ordinary explanations.` });
+  if (consecutiveWindows >= 4) signals.push({ id: "consecutive-authorizations", category: "visitor", points: 20,
+    title: "Successive visitor authorizations", detail: `${consecutiveWindows} authorization windows start within 24 hours after the previous one ends. This recurring pattern needs context; it does not establish paid accommodation.` });
+  if (all.lateNightEntries >= 4 && all.uniqueVisitorCredentials >= 4) signals.push({ id: "late-access-pattern", category: "access", points: 15,
+    title: "Late entries alongside visitor activity", detail: `${all.lateNightEntries} granted entries fall between 22:00 and 06:00, alongside ${all.uniqueVisitorCredentials} visitor credentials. Late hours alone do not establish a concern.` });
+  return signals;
 }
-
-export function getResidentComplaints(unitId: string): ResidentComplaint[] {
-  return residentComplaints.filter((complaint) => complaint.unitId === unitId);
+export const units: Unit[] = mockDatabase.units.map((unit) => ({ ...unit, riskScore: 0, riskLevel: "low", signals: deriveSignals(unit.id) }));
+export function getUnitById(id: string): Unit | undefined { return units.find((unit) => unit.id === id); }
+export function getUnitByNumber(number: string): Unit | undefined { return units.find((unit) => unit.unitNumber === number); }
+export function getMockDataStats() {
+  return { units: units.length, accessEvents: accessActivity.length, visitorRegistrations: visitorActivity.length,
+    securityReports: securityReports.length, residentComplaints: residentComplaints.length,
+    observationWindow: mockDatabase.metadata.observationWindow, synthetic: true as const };
 }

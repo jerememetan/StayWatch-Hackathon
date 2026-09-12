@@ -1,0 +1,86 @@
+[
+  {
+    "case_id": "CASE-001",
+    "unit_number": "A-03-01",
+    "risk_score": 94,
+    "risk_level": "high",
+    "pattern": "rapid_guest_turnover",
+    "signals": [
+      "10 distinct visitor credentials used in short 1-2 day cycles",
+      "Repeated check-in/check-out behaviour resembles hotel-style turnover",
+      "Public social post references short stays and access-card provision"
+    ],
+    "recommended_action": "Human review; verify occupier and tenancy records, then inspect supporting listing evidence.",
+    "demo_ground_truth": "suspicious"
+  },
+  {
+    "case_id": "CASE-002",
+    "unit_number": "A-07-02",
+    "risk_score": 91,
+    "risk_level": "high",
+    "pattern": "web_listing_match",
+    "signals": [
+      "Six short-duration visitor stays within one month",
+      "High image/text similarity to a public nightly-stay listing",
+      "Listing advertises flexible nightly stays and self check-in"
+    ],
+    "recommended_action": "Human review with listing screenshots and access-event timeline.",
+    "demo_ground_truth": "suspicious"
+  },
+  {
+    "case_id": "CASE-003",
+    "unit_number": "A-05-02",
+    "risk_score": 82,
+    "risk_level": "high",
+    "pattern": "late_night_short_stays",
+    "signals": [
+      "Eight unique visitor credentials activated late at night",
+      "Most stays last only 4-7 hours",
+      "Pattern repeats every few days"
+    ],
+    "recommended_action": "Review visitor purpose and compare against resident-declared guest records.",
+    "demo_ground_truth": "suspicious"
+  },
+  {
+    "case_id": "CASE-004",
+    "unit_number": "B-06-02",
+    "risk_score": 73,
+    "risk_level": "medium",
+    "pattern": "possible_overcrowding",
+    "signals": [
+      "Eight active access credentials observed repeatedly",
+      "Registered occupancy is lower than observed credential activity",
+      "Persistent usage across the month rather than isolated visits"
+    ],
+    "recommended_action": "Verify authorised occupants before escalating; access-card count alone is not conclusive.",
+    "demo_ground_truth": "needs_review"
+  },
+  {
+    "case_id": "CASE-005",
+    "unit_number": "B-04-01",
+    "risk_score": 58,
+    "risk_level": "medium",
+    "pattern": "repeated_weekend_visitors",
+    "signals": [
+      "Multiple unique visitor QR codes on most weekends",
+      "Visitors often remain overnight",
+      "Weak classified-ad match found, but similarity is low"
+    ],
+    "recommended_action": "Monitor; insufficient evidence for escalation without stronger corroboration.",
+    "demo_ground_truth": "ambiguous"
+  },
+  {
+    "case_id": "CASE-006",
+    "unit_number": "B-03-02",
+    "risk_score": 18,
+    "risk_level": "low",
+    "pattern": "normal_guest_activity",
+    "signals": [
+      "Visitor frequency within property baseline",
+      "Guest durations are consistent with normal social visits",
+      "No corroborating public listing found"
+    ],
+    "recommended_action": "No action.",
+    "demo_ground_truth": "normal"
+  }
+]

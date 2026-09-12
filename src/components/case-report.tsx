@@ -30,6 +30,15 @@ export function CaseReport({ report }: CaseReportProps) {
       <EvidenceSection title="Potential indicators" items={report.potentialIndicators} />
       <EvidenceSection title="Supporting evidence" items={report.supportingEvidence} />
       <EvidenceSection title="Uncertainty" items={report.uncertainty} />
+      {Boolean(report.webSources?.length) && (
+        <section className="report-section" aria-label="Public sources retrieved">
+          <h3>Public sources retrieved</h3>
+          <p className="source-note">Live search results are leads. They are not verified matches to this fictional property.</p>
+          <ul>{report.webSources?.map((source) => (
+            <li key={source.id}><a className="source-link" href={source.url} target="_blank" rel="noopener noreferrer">{source.title} ↗</a></li>
+          ))}</ul>
+        </section>
+      )}
       <section className="report-review" aria-labelledby="report-human-review">
         <span className="eyebrow">Recommended human review</span>
         <h3 id="report-human-review">Assess the context before any follow-up</h3>
