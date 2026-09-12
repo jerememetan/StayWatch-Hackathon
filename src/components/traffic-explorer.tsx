@@ -61,7 +61,10 @@ export function TrafficExplorer({ units, access, visitors }: Props) {
           <div className="traffic-detail-head"><div><span className="eyebrow">Selected unit</span><h3>#{selected.unitNumber} activity trend</h3></div><span className="traffic-total">{totalVisits}<small>granted events</small></span></div>
           <svg viewBox="0 0 400 170" role="img" aria-label={`Daily granted access events for unit ${selected.unitNumber}`} className="traffic-chart">
             <line x1="30" x2="370" y1="130" y2="130" className="chart-axis" /><line x1="30" x2="370" y1={130 - (baseline / peak) * 104} y2={130 - (baseline / peak) * 104} className="chart-baseline" />
-            <polyline points={chartPoints} className="chart-line" />{data.series.map((value, index) => <circle key={index} cx={30 + index * (340 / Math.max(data.series.length - 1, 1))} cy={130 - (value / peak) * 104} r="3.5" className="chart-point"><title>{displayDate(data.keys[index])}: {value} granted events</title></circle>)}
+            <polyline points={chartPoints} className="chart-line" />{data.series.map((value, index) => {
+              const label = `${displayDate(data.keys[index])}: ${value} granted events`;
+              return <circle key={index} cx={30 + index * (340 / Math.max(data.series.length - 1, 1))} cy={130 - (value / peak) * 104} r="3.5" className="chart-point" title={label} />;
+            })}
             <text x="30" y="153">{displayDate(data.keys[0])}</text><text x="370" y="153" textAnchor="end">{displayDate(data.keys[data.keys.length - 1])}</text><text x="367" y={126 - (baseline / peak) * 104} textAnchor="end" className="baseline-label">daily average {baseline.toFixed(1)}</text>
           </svg>
           <p className="chart-caption">Look for sustained departures from the unit’s own usual pattern, then review the underlying records.</p>
