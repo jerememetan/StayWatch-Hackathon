@@ -57,10 +57,14 @@ function unsupportedSourceAbsences(args: Record<string, unknown>): string[] {
     { availability: mockDatabase.metadata.availability.residentComplaints, label: "resident complaints", topic: "(?:resident )?complaints?" },
   ];
   const claims = [String(args.summary), ...(args.potentialIndicators as string[]), ...(args.supportingEvidence as string[])];
-  // Remove explicit missing-data statements, then check the remaining clauses for
-  // unsupported zero-incident/zero-complaint claims. This is not a general fact checker.
-  const missingDataStatement = /\bno\s+(?:security\s+(?:reports?|records?|observations?|data)|(?:resident\s+)?complaints?(?:\s+(?:data|records?|reports?))?)\s+(?:(?:are|is|were|was)\s+)?(?:available|provided|supplied|included)\b/gi;
-  const clauses = claims.flatMap((claim) => claim.replace(missingDataStatement, "").split(/[.!?;\n]/));
+  // Remove only explicit caveat spans, preserving any separate absence assertion
+  // in the same clause. This is a targeted guard, not a general fact checker.
+  const dataTopic = "(?:security\\s+(?:reports?|records?|observations?|data)|(?:resident\\s+)?complaints?(?:\\s+(?:data|records?|reports?))?)";
+  const sourceTopic = `(?:${checks.map(({ topic }) => topic).join("|")})`;
+  const missingDataStatement = new RegExp(`\\bno\\s+${dataTopic}(?:\\s+(?:or|and)\\s+${dataTopic})*\\s+(?:(?:are|is|were|was)\\s+)?(?:available|provided|supplied|included)\\b`, "gi");
+  const negatedAbsence = new RegExp(`\\bnot\\s+(?:proof|evidence)\\s+that\\s+(?:no|zero)\\s+${sourceTopic}(?:\\s+(?:occurred|were\\s+(?:reported|recorded)))?\\b`, "gi");
+  const unknownConclusion = new RegExp(`\\bno\\s+conclusions?\\s+(?:about|regarding)\\s+${sourceTopic}(?:\\s+(?:or|and)\\s+${sourceTopic})*\\s+(?:can|could)\\s+be\\s+drawn\\b`, "gi");
+  const clauses = claims.flatMap((claim) => claim.replace(missingDataStatement, " ").replace(negatedAbsence, " ").replace(unknownConclusion, " ").split(/[.!?;\n]/));
   return checks.filter(({ availability, topic }) => {
     if (availability.available) return false;
     const absence = new RegExp(`\\b(?:no|zero|neither)\\b[^.!?;\\n]{0,90}?\\b${topic}\\b|\\b${topic}\\b[^.!?;\\n]{0,40}?\\b(?:none|zero|absent|0)\\b`, "i");
@@ -174,13 +178,29 @@ export async function investigateUnit(unitId: string, options: InvestigationOpti
     await executeTool("get_security_reports", {});
     await executeTool("get_resident_complaints", {});
     await executeTool("search_web", { query: `${mockDatabase.metadata.building.district} Singapore short stay apartments` });
-    const totals = (activity as ToolResult).totals as { access: number; visitors: number };
+    const comparison = (activity as ToolResult).comparison as import("@/lib/mock-types").ActivityComparison;
+    const { all, baseline, recent } = comparison;
+    const priorityPoints = Math.min(100, unit.signals.reduce((total, signal) => total + signal.points, 0));
+    const describeChange = (label: string, previous: number, current: number) =>
+      `${label} ${current === previous ? "stayed at" : current > previous ? "increased from" : "decreased from"} ${previous}${current === previous ? "" : ` to ${current}`}`;
+    const windowChange = `${describeChange("Access attempts", baseline.accessCount, recent.accessCount)}; ${describeChange("visitor registrations", baseline.visitorCount, recent.visitorCount)}.`;
     await executeTool("create_case_report", {
-      summary: `Offline mock-record review for ${unit.unitNumber}. No OpenAI reasoning or live public-web search was performed.`,
-      potentialIndicators: [`The recent period contains ${totals.access} access records and ${totals.visitors} visitor authorizations to assess in context.`],
-      supportingEvidence: [`get_unit_activity returned ${totals.access} access and ${totals.visitors} visitor records for ${unit.id}; the tool output includes baseline comparisons and original record IDs.`],
-      uncertainty: ["This is a deterministic offline summary, not an AI investigation. The mock records alone cannot establish a short-term rental."],
-      recommendedHumanReview: "Compare the access log and visitor register with the baseline and verify ordinary explanations.",
+      summary: `Offline mock-record review for ${unit.unitNumber}. No OpenAI reasoning or live public-web search was performed. The whole month contains ${all.accessCount} access attempts and ${all.visitorCount} visitor registrations, triggering ${unit.signals.length} scoring ${unit.signals.length === 1 ? "rule" : "rules"} (${priorityPoints}/100 review-priority points). In the equal 15-day comparison windows: ${windowChange}`,
+      potentialIndicators: unit.signals.length
+        ? unit.signals.map((signal) => `${signal.title} (+${signal.points} points). ${signal.detail}`)
+        : ["No whole-month scoring rules were triggered by the supplied activity. Missing evidence and ordinary explanations still require human review."],
+      supportingEvidence: [
+        `get_unit_activity comparison.all covers ${all.window.start} to ${all.window.end}: ${all.accessCount} access attempts, ${all.visitorCount} visitor registrations, ${all.uniqueVisitorCredentials} visitor credentials with granted access, and ${all.shortAuthorizationCount} authorizations lasting 24–72 hours.`,
+        `The baseline (${baseline.window.start} to ${baseline.window.end}) contains ${baseline.accessCount} access attempts and ${baseline.visitorCount} registrations; the recent window (${recent.window.start} to ${recent.window.end}) contains ${recent.accessCount} access attempts and ${recent.visitorCount} registrations. ${windowChange}`,
+        "The score describes patterns across the whole observation month; the comparison describes changes between two equal 15-day windows. A quieter recent window does not remove earlier recurring patterns or establish wrongdoing.",
+        `The retrieved page for ${unit.id} contains original record IDs and whole-window summaries. Paginated records are a sample, not the complete observation month.`,
+      ],
+      uncertainty: [
+        "This is a deterministic offline summary, not an AI investigation. The mock records alone cannot establish a short-term rental.",
+        "Rule points prioritize human review; they are not a probability of a violation. Registrations, authorization durations and credentials do not establish distinct people or actual stays.",
+        "The 15-day comparison excludes August 1; the whole-month score includes it. No credential-to-visitor mapping was supplied.",
+      ],
+      recommendedHumanReview: "Review each whole-month scoring reason against the original access log and visitor register, consider the equal-window comparison, and verify ordinary explanations such as family visits or maintenance.",
       confidence: "low",
     });
     return { report: report!, timeline, mode: "demo" };

@@ -46,6 +46,26 @@ describe("investigateUnit", () => {
     expect(result.timeline.find((entry) => entry.tool === "search_web")?.status).toBe("unavailable");
   });
 
+  it("explains whole-month triggers without inventing a recent surge in the offline report", async () => {
+    const result = await investigateUnit("UNIT-003", { useLiveServices: false });
+
+    expect(result.mode).toBe("demo");
+    expect(result.report.summary).toContain("128 access attempts and 10 visitor registrations");
+    expect(result.report.summary).toContain("4 scoring rules (90/100 review-priority points)");
+    expect(result.report.summary).toContain("Access attempts decreased from 64 to 60");
+    expect(result.report.summary).toContain("visitor registrations decreased from 7 to 3");
+    expect(result.report.potentialIndicators.join(" ")).toContain("Repeated short authorization windows (+25 points)");
+    expect(result.report.potentialIndicators.join(" ")).toContain("Successive visitor authorizations (+20 points)");
+    expect(result.report.supportingEvidence.join(" ")).toMatch(/whole observation month.*two equal 15-day windows/);
+    expect(result.report.uncertainty.some((note) => /August 1/.test(note) && /exclud/.test(note) && /15-day/.test(note))).toBe(true);
+    expect(result.report.uncertainty.join(" ")).toContain("not a probability of a violation");
+    expect(result.report.summary).toContain("No OpenAI reasoning or live public-web search was performed");
+    expect(result.report.uncertainty.join(" ")).toContain("deterministic offline summary");
+    expect(result.timeline.at(-1)?.status).toBe("complete");
+    expect(services.responses).not.toHaveBeenCalled();
+    expect(services.search).not.toHaveBeenCalled();
+  });
+
   it("passes complete paginated JSON from the selected unit back to the model", async () => {
     const requests: unknown[] = [];
     const sequence = [
@@ -177,6 +197,37 @@ describe("investigateUnit", () => {
     expect(result.report.summary).toBe(corrected.summary);
     expect(result.report.potentialIndicators).toEqual(corrected.potentialIndicators);
     expect(JSON.stringify(result.report)).not.toMatch(/no denied entry attempts or security incidents|no resident complaints for the unit/i);
+    expect(services.responses).toHaveBeenCalledTimes(5);
+  });
+
+  it.each([
+    { field: "summary", value: "Security reports are unavailable in the supplied dataset. This is missing evidence, not proof that no incidents occurred." },
+    { field: "potentialIndicators", value: ["Resident complaints are unavailable in the supplied dataset. This is missing evidence, not proof that no incidents occurred."] },
+    { field: "supportingEvidence", value: ["No conclusion about security incidents or resident complaints can be drawn because these sources are unavailable."] },
+    { field: "supportingEvidence", value: ["No security reports or resident complaints were provided in the supplied dataset."] },
+  ])("accepts missing-source caveats without claiming an absence in $field", async ({ field, value }) => {
+    const args = { ...reportArgs, [field]: value };
+    [tool("get_unit_activity", { period: "recent", offset: 0 }), tool("get_security_reports"), tool("get_resident_complaints"),
+      tool("create_case_report", args)]
+      .forEach((response) => services.responses.mockResolvedValueOnce(response));
+    const result = await investigateUnit("A-03-01");
+    expect(result.timeline.at(-1)?.status).toBe("complete");
+    expect(result.report).toMatchObject({ [field]: value });
+    expect(services.responses).toHaveBeenCalledTimes(4);
+  });
+
+  it.each([
+    "This is missing evidence, not proof that no incidents occurred, but no resident complaints occurred.",
+    "No conclusion about security incidents can be drawn, but no resident complaints occurred.",
+    "No security reports or resident complaints were provided, but no security incidents occurred.",
+  ])("still rejects a separate unsupported absence after a missing-source caveat: %s", async (summary) => {
+    [tool("get_unit_activity", { period: "recent", offset: 0 }), tool("get_security_reports"), tool("get_resident_complaints"),
+      tool("create_case_report", { ...reportArgs, summary }), tool("create_case_report", reportArgs)]
+      .forEach((response) => services.responses.mockResolvedValueOnce(response));
+    const result = await investigateUnit("A-03-01");
+    expect(result.timeline.at(-2)?.status).toBe("error");
+    expect(result.timeline.at(-1)?.status).toBe("complete");
+    expect(result.report.summary).toBe(reportArgs.summary);
     expect(services.responses).toHaveBeenCalledTimes(5);
   });
 
