@@ -98,7 +98,7 @@ export function UnitDetail({ unit, comparison, securityReports, complaints, live
         <p><strong>A starting point for human review.</strong> These records show potential indicators, not a conclusion about a resident or visitor. The score is a rule-based review priority, not a probability of a violation.</p>
         <div className={styles.quickActions}>
           <a href="#investigation-panel">Prepare case report <svg aria-hidden="true" viewBox="0 0 20 20" width="16" height="16" fill="none"><path d="M10 3v14m-5-5 5 5 5-5" stroke="currentColor" strokeWidth="1.5" /></svg></a>
-          <a href="#photo-review-panel">Review room photo <svg aria-hidden="true" viewBox="0 0 20 20" width="16" height="16" fill="none"><path d="M10 3v14m-5-5 5 5 5-5" stroke="currentColor" strokeWidth="1.5" /></svg></a>
+          <a href="#photo-review-panel">Review CCTV still <svg aria-hidden="true" viewBox="0 0 20 20" width="16" height="16" fill="none"><path d="M10 3v14m-5-5 5 5 5-5" stroke="currentColor" strokeWidth="1.5" /></svg></a>
         </div>
       </div>
 

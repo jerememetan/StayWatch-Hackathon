@@ -2,34 +2,35 @@ export const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
 export const PHOTO_MIME_TYPES = ["image/jpeg", "image/png", "image/webp"] as const;
 
 export const photoObjectLabels = {
-  bed_frame: "Bed frames",
-  mattress: "Mattresses",
-  bunk_bed_frame: "Bunk bed frames",
-  sofa: "Sofas",
-  room_divider: "Room dividers",
-  doorway: "Doorways",
-  storage_cabinet: "Storage cabinets",
+  rolling_luggage: "Rolling luggage",
+  suitcase: "Suitcases",
+  travel_bag: "Travel bags",
+  luggage_trolley: "Luggage trolleys",
+  taxi_or_rideshare: "Taxi or ride-hailing vehicles",
+  vehicle_at_dropoff: "Vehicles at the drop-off",
+  stacked_bags: "Stacked bags",
 } as const;
 
 export const photoLayoutLabels = {
-  partial_room_view: "Only part of the room is visible.",
-  objects_near_doorway: "Objects appear near a doorway; clearance needs an on-site check.",
-  temporary_partition_visible: "A freestanding or temporary divider appears visible.",
-  multiple_sleeping_surfaces_visible: "Several possible sleeping surfaces are visible; their use is unknown.",
+  entrance_or_lobby_view: "The frame shows a building entrance or lobby approach.",
+  dropoff_bay_visible: "A drop-off bay or driveway is visible.",
+  luggage_near_entrance: "Bags appear near an entrance; purpose needs an on-site check.",
+  night_scene: "The frame appears to be a night or low-light exterior scene.",
 } as const;
 
 export const photoLimitationLabels = {
   blur: "Blur limits visible detail.",
   low_light: "Low light limits visible detail.",
   occlusion: "Objects are partly hidden.",
-  cropped_view: "The photo does not show the whole room.",
+  cropped_view: "The still does not show the whole entrance or driveway.",
   perspective: "The camera angle can distort spacing and counts.",
-  not_room: "The image does not show an interior room suitable for this review.",
+  glare_or_weather: "Glare, rain, or weather limits visible detail.",
+  not_exterior: "The image does not show an outdoor building entrance, driveway, or common area suitable for this review.",
   cannot_assess: "There is not enough visible detail for a useful review.",
 } as const;
 
 export type PhotoAssessment = {
-  view: "room" | "not_room" | "unclear";
+  view: "exterior" | "not_exterior" | "unclear";
   quality: "clear" | "limited" | "unusable";
   objects: Array<{ kind: keyof typeof photoObjectLabels; visibleCount: number; certainty: "clear" | "uncertain" }>;
   layoutFeatures: Array<keyof typeof photoLayoutLabels>;
@@ -60,7 +61,7 @@ function isChoiceList(value: unknown, choices: string[]): value is string[] {
 // a claim about a person, their identity, their tenancy, or legal status.
 export function isPhotoAssessment(value: unknown): value is PhotoAssessment {
   if (!hasExactKeys(value, ["view", "quality", "objects", "layoutFeatures", "limitations"])) return false;
-  if (!isChoice(value.view, ["room", "not_room", "unclear"]) || !isChoice(value.quality, ["clear", "limited", "unusable"])) return false;
+  if (!isChoice(value.view, ["exterior", "not_exterior", "unclear"]) || !isChoice(value.quality, ["clear", "limited", "unusable"])) return false;
   if (!Array.isArray(value.objects) || value.objects.length > Object.keys(photoObjectLabels).length) return false;
   const kinds = new Set<string>();
   for (const item of value.objects) {
@@ -70,7 +71,7 @@ export function isPhotoAssessment(value: unknown): value is PhotoAssessment {
     kinds.add(item.kind);
   }
   if (!isChoiceList(value.layoutFeatures, Object.keys(photoLayoutLabels)) || !isChoiceList(value.limitations, Object.keys(photoLimitationLabels))) return false;
-  if ((value.view !== "room" || value.quality === "unusable") && (value.objects.length > 0 || value.layoutFeatures.length > 0)) return false;
+  if ((value.view !== "exterior" || value.quality === "unusable") && (value.objects.length > 0 || value.layoutFeatures.length > 0)) return false;
   return value.limitations.length > 0;
 }
 
