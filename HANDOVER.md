@@ -139,7 +139,7 @@ All three internal sources must be checked before accepting a report, including 
 
 Exa search is conditional on the model finding it useful, not forced. Queries must use broad public descriptions and omit internal identifiers. Search returns actual HTTP(S) source URLs/excerpts with IDs, with bounded result counts and a timeout. Missing/failing Exa remains an evidence gap. No simulated listing is substituted.
 
-Reports contain summary, potentialIndicators, supportingEvidence, uncertainty, recommendedNextSteps, confidence, and optional retrieved webSources. Missing-source and synthetic-context caveats are retained. Check the actual TypeScript schema before changing field names.
+Reports contain unitNumber, disposition, summary, potentialIndicators, supportingEvidence, uncertainty, recommendedHumanReview, confidence, and optional retrieved webSources. Missing-source and synthetic-context caveats are retained. Check the actual TypeScript schema before changing field names.
 
 ## Latest fix: landed, needs final integrated verification
 
