@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Unit } from "@/lib/types";
 import { mockDatabase } from "@/lib/data";
+import { TrafficExplorer } from "@/components/traffic-explorer";
 
 type DashboardProps = { units: Unit[] };
 type UnitView = Unit & {
@@ -52,6 +53,8 @@ export function Dashboard({ units }: DashboardProps) {
         <div className="metric"><span className="metric-label">Source records</span><span className="metric-value">{recordCount.toLocaleString("en-SG")}</span><span className="metric-note">Available to investigation tools</span></div>
         <div className="metric"><span className="metric-label">Action authority</span><span className="metric-value">Human</span><span className="metric-note">Review required every time</span></div>
       </section>
+
+      <TrafficExplorer units={mockDatabase.units} access={mockDatabase.accessActivity} visitors={mockDatabase.visitorActivity} />
 
       <section aria-labelledby="queue-heading">
         <div className="section-head">
